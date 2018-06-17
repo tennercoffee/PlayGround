@@ -1,0 +1,627 @@
+<html>
+	<head>
+	    <title>bKev</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script language="JavaScript" src="http://www.geoplugin.net/javascript.gp" type="text/JavaScript"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB10G4tIPdXMCacVCzVM9J9Nko9ity9Ho0" async defer></script>
+		<script>
+			//API JavaScript
+			function getJSONByIP(ip) {
+				var url = 'http://www.geoplugin.net/json.gp?ip=' + ip;
+				var xhr = createCORSRequest('GET', url);
+				xhr.send();
+					
+				if (geoplugin_status() == 200) {
+					var obj = this.responseData;
+					var lat,lng;
+					// Response handlers.
+					xhr.onload = function() {
+						//get lat,lng from JSON
+						var text = xhr.responseText;
+						var json = JSON.parse(text);
+						lat = Number(json.geoplugin_latitude);
+						lng = Number(json.geoplugin_longitude);
+						
+						//then center map on those coordinates
+						map = new google.maps.Map(document.getElementById('tracker_map'), {
+						  center: {lat, lng},
+						  zoom: 14,
+						  mapTypeId: 'hybrid'
+						});
+						
+						//then add marker to map
+						var marker = new google.maps.Marker({
+						  position: {lat, lng},
+						  map: map
+						});
+
+						// show map, hide results iFrame
+						if(document.getElementById('tracker_map').style.display = 'none') {
+							document.getElementById('form_results_iframe').style.display = 'none';
+							document.getElementById('tracker_map').style.display = 'block';
+						}
+					};
+				}
+			}
+			// Create the XHR object.
+			function createCORSRequest(method, url) {
+			  var xhr = new XMLHttpRequest();
+			  if ("withCredentials" in xhr) {
+				// XHR for Chrome/FireFox/Opera/Safari.
+				xhr.open(method, url, true);
+			  } else if (typeof XDomainRequest != "undefined") {
+				// XDomainRequest for IE.
+				xhr = new XDomainRequest();
+				xhr.open(method, url);
+			  } else {
+				// CORS not supported.
+				xhr = null;
+			  }
+			  return xhr;
+			}
+		</script>
+		<script>
+			function closeSidebar() {
+				//close the sidebar
+				document.getElementById("sidebar").style.display = "none";
+				document.getElementById("sidebar_menu").style.display = "none";
+			}
+			function hideMap() {
+				//hide the map if it is visible
+				if(document.getElementById('tracker_map').style.display = 'block') {
+					document.getElementById('tracker_map').style.display = 'none';
+					document.getElementById('form_results_iframe').style.display = 'block';
+				}
+			}
+			function openSidebar() {
+				//open the sidebar
+				document.getElementById("sidebar").style.display = "block";
+				document.getElementById("sidebar_menu").style.display = "block";
+			}
+			function reloadPage() {
+				document.location.reload();
+			}
+			function toggleCredits() {
+				if(document.getElementById('apis').style.display === 'block') {
+					document.getElementById('apis').style.display = 'none';
+				} else {
+					document.getElementById('apis').style.display = 'block';
+				}
+			}
+			function showForm(id) {
+				document.getElementById(id).classList.toggle("report_form");
+			}
+			function trackIPFunction() {
+				//call a function to get JSON from that site, using IP
+				var ip = document.getElementById("ip_input").value;
+				var json = getJSONByIP(ip);
+			}
+		</script>
+		<style>	
+		/*
+		colors: 
+		select blue #4F98DB
+		 - hover #4f82db
+		select green #5fc782
+		background grey #464950
+		foreground grey 53575E
+		header grey 3A3D42
+		menu select blue: #6CB6F5
+		sidebar-banner grey: #A6A6A6
+		*/
+		
+		* {
+			border-radius: 3px;
+			cursor:default;
+			font-family: source-sans-pro,sans-serif;
+		}
+		a {
+			color: #4F98DB;
+			cursor:pointer;
+		}
+		#apis {
+			display:none;
+		}
+		#apis .sidebar_menu_credit_option{
+			font-size:15px;
+			padding-left:42px;
+		}
+		.app-logo {
+			justify-content: flex-end;
+			flex: 1;
+		}
+		.app-logo img {
+			width:90px;
+			float: right;
+		}
+		body {
+			margin:0px;
+		}
+		.button-rightcolumn {
+			float:right;
+		}
+		.close_button {
+			position: absolute;
+			margin-top: 10px;
+			margin-left: 7px;
+		}
+		.col-25 {
+			float: left;
+			width: 35%;
+			margin-top: 6px;
+		}
+		.col-50 {
+			width: 45%;
+			margin-top: 6px;
+		}
+		.col-75 {
+			float: left;
+			width: 65%;
+			margin-top: 6px;
+		}
+		.container {
+			border-radius: 5px;
+			background-color: #f2f2f2;
+			padding: 20px;
+		}
+		#doc-text {
+			float:left;
+			margin-left:20px;
+		}
+		.dropbtn {
+			background-color: #4F98DB;
+			color: white;
+			padding: 16px;
+			font-size: 16px;
+			border: none;
+			cursor: pointer;
+			width: 100%;
+		}
+		.dropdown {
+			position: relative;
+			display: inline-block;
+			margin-bottom: 10px;
+		}
+		.dropdown-content {
+			display: none;
+			position: absolute;
+			background-color: #f9f9f9;
+			min-width: 160px;
+			box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+			z-index: 1;
+			width:95%;
+		}
+		.dropdown-content a {
+			color: black;
+			padding: 12px 16px;
+			text-decoration: none;
+			display: block;
+		}
+		.dropdown-content a:hover {
+			background-color: #f1f1f1;
+			cursor:pointer;
+		}
+		.dropdown:hover .dropdown-content {
+			display: block;
+		}
+		.dropdown:hover .dropbtn {
+			background-color: #4f82db;
+		}
+		.footer {
+		    position: fixed;
+		    left: 0;
+		    bottom: 0;
+		    width: 100%;
+		    color: white;
+		    border-radius:0px;
+			margin-bottom:5px;
+		}
+		form {
+			background-color:#53575E;
+			padding-bottom:3px;
+			border-bottom-width: 2px;
+			border-bottom-color: #FFF;
+			border-bottom-style: solid;
+		}
+		.form-label {
+			padding-bottom:5px;
+			padding-top:5px;
+			text-align:center;
+			text-decoration:underline;
+		}
+		.form-panel {
+		    display: flex;
+		    flex-direction: column;
+			overflow:auto;
+			width: 27%;
+			overflow-x: hidden;
+			padding: 5px;
+			padding-right: 10px;
+			padding-left: 10px;
+			margin-right: 5px;
+			background-color: #53575E;
+        }
+		#form-panel2 {
+			display:none;
+		}
+		#form-panel2 .dropdown-content {
+			right:0;
+		}
+		#form_results_iframe2 {
+			display:none;
+			margin-right: 5px;
+		}
+		.help {
+			max-width: 20px;
+			padding-top: 13px;
+		}
+		html {
+		    background-color: #1C1D1F;
+		    color: #FFF;
+		}
+		h1 {
+		    color: #FFF;
+			margin-left:10px;
+			font-size:40px;
+			margin: 5px;
+		}
+		h2 {
+			margin:5px;
+			margin-left:10px;
+			font-size:20px;
+		}
+		header {
+		    flex:1;
+            color: #FFF;
+            background-color: #3A3D42;
+            border-bottom: 1px solid #;
+			margin:0px;
+		}
+		.header-flex {
+			display:flex;
+		}
+		header .left {
+		    display: flex;
+		    justify-content: flex-start;
+		    flex-flow: row nowrap;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            
+		}
+		header .center {
+		    display: flex;
+		    justify-content: center;
+		    flex-flow: row nowrap;
+            flex-direction: row;
+            flex-wrap: nowrap;
+		}
+		header .right {
+		    display: flex;
+		    justify-content: flex-end;
+		    flex-flow: row nowrap;
+            flex-direction: row;
+            flex-wrap: nowrap;
+		}
+		.hidden {
+			display:none;
+		}
+		hr {
+		    width:100%;
+		}
+		.input-date {
+			width:89%;
+			padding: 5px;
+		}
+		.input-number {
+			width:90%
+			float: right;
+		}
+		input[type=submit] {
+			background-color: #5fc782;
+			color: white;
+			padding: 12px 20px;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			margin: 2px;
+		}
+		input[type=submit]:hover {
+			background-color: #45a049;
+		}
+		input[type=text], input[type=number], select, textarea {
+			padding: 5px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			resize: vertical;
+			cursor:text;
+		}
+		label {
+			padding: 12px 12px 12px 0;
+			display: inline-block;
+		}
+		.map {
+		    display: none;
+            flex-direction: column;
+            justify-content: flex-end;
+			flex: 1;
+			background-color: #EEE;
+			overflow:auto;
+			margin-right: 5px;
+			width:600;
+			height:100%;
+			frameborder:0;
+		}
+		.menu_text {
+			display:none;
+		}
+		.menu_text .sidebar_menu_option {
+			font-size:20px;
+			text-indent: 20px;
+		}
+		#phisto_sidebar_button {
+			width:30px;
+			height:30px;
+			margin-top: 10px;
+			margin-left: 10px;
+		}
+		#phisto_close_menu_button {
+			width:30px;
+			height:30px;
+			margin-top: 10px;
+			margin-left: 10px;
+		}
+		.report_form {
+			display:none;
+			text-align:center;
+		}
+		.row {
+			margin-top:5px;
+		}
+		.row:after {
+			content: "";
+			display: table;
+			clear: both;
+		}
+		.results {
+		    display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+			flex: 1;
+			background-color: #EEE;
+			overflow:auto;
+			margin-right: 15px;
+		}
+		.right-side {
+			display:none;
+		}
+		select {
+			width:94%;
+		}
+		.sidebar {
+			display:none;
+			left: 0;
+			top: 0;
+			position: fixed;
+			z-index: 1;
+			background-color: #fff;
+			transition: 1.0s;
+			height: 98%;
+			width:303px;
+			background-color:#4B4D51;
+		}
+		.sidebar a {
+			padding: 8px 8px 8px 32px;
+			text-decoration: none;
+			font-size: 24px;
+			color: #818181;
+			display: block;
+			transition: 0.3s;
+			border-bottom: 1px solid #D6D9DE;
+		}
+		.sidebar a:hover {
+			color: #f1f1f1;
+			background-color: #6CB6F5;
+		}
+		.sidebar h1 {
+			color: white;
+		}
+		.sidebar .app-name {
+			margin-left: 28px;
+		}
+		.sidebar_banner {
+			height:24%;
+		}
+		#sidebar_menu {
+			background-color:white;
+			height:76%
+		}
+		.sidebar_menu .app-name {
+			float:right;
+		}
+		.sidebar_menu_button {
+		    margin-top: 15px;
+			margin-left: 7px;
+		}
+		.sidebar_title {
+			margin-bottom:20px;
+		}
+		.sidebar_title .app-name {
+			float:right;
+		}
+		.show{
+			display: block;
+		}
+		.submit-button {
+			float:right;
+		}
+		.submit-button-rightcolumn {
+			float:left;
+		}
+		.view-pane {
+			display: flex;
+			overflow:auto;
+			margin:10px;
+			bottom: 0;
+			left: 0;
+			position: absolute;
+			width: 99%;
+			top: 0;
+			margin-top: 65px;
+			margin-bottom: 10px;
+			margin-left: 10px;
+			margin-right: 10px;
+		}
+		#version-text {
+			text-align: center;
+			margin-right:20px;
+			width:100%;
+			position:absolute;
+			bottom:0;
+			color: #000;
+		}
+		::-webkit-scrollbar {
+			width: 5px;
+			direction:rtl;
+		}
+		::-webkit-scrollbar-track {
+			background: #464950;; 
+		}
+		::-webkit-scrollbar-thumb {
+			background: #FFF; 
+		}
+		::-webkit-scrollbar-thumb:hover {
+			background: #888; 
+		}
+		/* For Firefox */
+		input[type='number'] {
+			-moz-appearance:textfield;
+		}
+
+		/* Webkit browsers like Safari and Chrome */
+		input[type=number]::-webkit-inner-spin-button,
+		input[type=number]::-webkit-outer-spin-button {
+			-webkit-appearance: none;
+			margin: 0;
+		}
+		
+		@media screen and (max-width: 600px) {
+			.col-25, .col-75 {
+				width: 100%;
+				margin-top: 0;
+			}
+			.dropdown-content {
+				min-width: 160px;
+			}
+			select {
+				width:98%;
+			}
+			.submit-button {
+				width: 60%;
+			}
+			#version-text {
+				display: none;
+			}
+			#doc-text {
+				width:100%;
+				text-align:center;
+			}
+		}
+		@media screen and (min-width: 1200px) {
+			.form-panel {
+				width: 15%;
+			}
+		}
+		</style>
+	</head>
+	<body>
+	    <header>
+	        <div class="header-flex">
+				<div class="sidebar" id="sidebar">
+					<div class="sidebar_banner">
+						<div class="sidebar_title">
+							<svg id="phisto_close_menu_button" viewBox="0 0 13 13" data-qa="close" onclick="closeSidebar()">
+								<polyline class="gui-close" fill="none" stroke="currentColor" points="1 1,6.5 6.5,12 1"></polyline>
+								<polyline class="gui-close" fill="none" stroke="currentColor" points="1 12,6.5 6.5,12 12"></polyline>
+							</svg>
+							<div class="app-name">
+								<h1>bK3v</h1>
+							</div>
+						</div>
+					</div>
+					<div id="sidebar_menu">
+						<a href="https://docs.google.com/document/d/e/2PACX-1vRiVPDKX0CTmujrivQIaeQvd5xRty0nKQOSElYnWXr_Mw7hXUVwNNJURp6nO9A9TwtjkM8Wj_B3ZSbi/pub" class="sidebar_menu_option" target="form_results_iframe">Documentation</a>
+						<a href="" class="sidebar_menu_option" target="form_results_iframe">Help & Feedback</a>
+						<a class="sidebar_menu_option" onclick="toggleCredits()">Credits</a>
+						<div id="credits">
+							<div id="apis">
+								<a href="http://www.geoplugin.com/geolocation/" class="sidebar_menu_credit_option" target="blank">GeoPlugin.com</a>
+								<a href="https://developers.google.com/maps/documentation/javascript/tutorial" class="sidebar_menu_credit_option" target="blank">Google Maps</a>
+							</div>
+						</div>
+					</div>
+					<div  id="version-text">
+						v1.1b
+					</div>
+				</div>
+				<div class="sidebar_menu" onclick="openSidebar()">
+					<svg id="phisto_sidebar_button" viewBox="0 0 26 21">
+					  <line stroke="currentColor" x1="1" x2="24" y1="2" y2="2" stroke-width="1" stroke-linecap="round"></line>
+					  <line stroke="currentColor" x1="1" x2="24" y1="11" y2="11" stroke-width="1" stroke-linecap="round"></line>
+					  <line stroke="currentColor" x1="1" x2="24" y1="20" y2="20" stroke-width="1" stroke-linecap="round"></line>
+					</svg>
+					<div class="app-name">
+						<h1>bK3v</h1>
+					</div>
+				</div>
+				<div class="app-logo">
+				</div>
+	        </div>
+	    </header>		
+		<div class="view-pane">
+			<div class="form-panel">
+				<div class="dropdown">
+				    <button class="dropbtn">Menu:</button>
+				    <div class="dropdown-content">
+						<a onclick=showForm("ip_tracker")>IP Tracker(BETA)</a>
+				    </div>
+				</div>
+			<!-- ---------------------------------------------------------------------------------------------- -->
+			<!-------------------------------- IP tracker beta------------------------------ -->
+								
+				<form action="javascript:void(0);"  class="report_form" id="ip_tracker" target="form_results_iframe" onsubmit="return trackIPFunction()" method="GET">
+					<div class="form-label">
+						IP Tracker
+					</div>
+					<div class="row">
+						<div class="col-25">
+							IP:
+						</div>
+						<div class="col-75">
+							<input type="text" id="ip_input" name="ip" value="" class="input-number" required>
+						</div>
+					</div>
+					<div class="row">
+						<input type="submit" id="ip_tracker_submit" value="Submit" class="submit-button">
+						<img src="http://images.clipartpanda.com/question-purzen_Icon_with_question_mark_Vector_Clipart.png" class="help button" onclick="alert('This is in BETA. \n It is not exact. \n IPv4 & IPv6')">
+					</div>
+				</form>
+								
+			<!-- ---------------------------------------------------------------------------------------------- -->
+			</div>
+			<iframe class="results" name="form_results_iframe" id="form_results_iframe">
+			</iframe>
+			<div id="tracker_map" class="map"></div>
+		</div>
+		<div class="footer">
+			<div class="row">
+			</div>
+		</div>
+	</body>
+</html>
+<!--
+changelog
+
+v1.1(5-27-18)
+ - remove extra forms from app
+ + fix toggle function for credits drop down
+-->
